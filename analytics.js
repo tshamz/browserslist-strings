@@ -13,9 +13,13 @@ const setAuth = async (email, key, project) => {
   // auth.subject = 'analytics2@bvaccel.com';
   // google.options({ auth, project, quotaUser });
 
-  const auth = new google.auth.JWT(email, null, key, scopes);
-  auth.subject = 'analytics2@bvaccel.com';
-  google.options({ auth, project, quotaUser });
+
+  const project = process.env.GOOGLE_PROJECT_ID;
+  console.log(project);
+
+  // const auth = new google.auth.JWT(email, null, key, scopes);
+  // auth.subject = 'analytics2@bvaccel.com';
+  // google.options({ auth, project, quotaUser });
 };
 
 const propertyHasStarredProfile = property => {
@@ -148,6 +152,6 @@ const clear = async () => {
   return await siteFacade.clear();
 };
 
-// update();
+setAuth();
 
 // module.exports = { get, update, clear, setAuth };

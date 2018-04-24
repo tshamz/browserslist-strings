@@ -23,8 +23,9 @@ app.use('/', routes);
 
 app.listen(config.server.port, () => {
   console.log(`Magic happens on port ${config.server.port}`);
-  console.log(config.MONGODB_URI);
+  console.log(process.env.MONGODB_URI);
   const email = process.env.GOOGLE_CLIENT_EMAIL;
+  console.log(email);
   // const privateKey = process.env.GOOGLE_PRIVATE_KEY;
   // const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
   // const project = process.env.GOOGLE_PROJECT_ID;
