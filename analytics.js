@@ -1,11 +1,8 @@
-const fetch = require('node-fetch');
+require('dotenv').config();
 const { google } = require('googleapis');
-
 const siteFacade = require('./model/site/facade');
 
 const analytics = google.analytics('v3');
-const scopes = ['https://www.googleapis.com/auth/analytics.readonly'];
-const quotaUser = 'browserslist-string';
 
 const setAuth = async () => {
   // const auth = await google.auth.getClient({ scopes });
@@ -14,9 +11,10 @@ const setAuth = async () => {
   // google.options({ auth, project, quotaUser });
 
   const email = process.env.GOOGLE_CLIENT_EMAIL;
-  // const privateKey = process.env.GOOGLE_PRIVATE_KEY;
   const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
+  const scopes = ['https://www.googleapis.com/auth/analytics.readonly'];
   const project = process.env.GOOGLE_PROJECT_ID;
+  const quotaUser = 'browserslist-string';
 
   const auth = new google.auth.JWT(email, null, privateKey, scopes);
   auth.subject = 'analytics2@bvaccel.com';
@@ -40,6 +38,9 @@ const createSiteObject = (profile, property, account) => {
       id: property.internalWebPropertyId,
       name: property.name,
       url: property.websiteUrl
+        .replace(/^https?:\/\//, '')
+        .replace(/^www\./, '')
+        .replace(/\/$/, '')
     },
     account: {
       id: account.id,
@@ -113,6 +114,12 @@ const flattenRequest = request => {
   }
 };
 
+const handleAnalyticsResponse = (request, browsers, total) => {
+  const filteredBrowsers = (browsers) ? filterBrowsers(browsers, 0.025, total) : [];
+  const flattenedRequest = flattenRequest(request);
+  return { ...flattenedRequest, browsers: filteredBrowsers };
+};
+
 const sendRequest = (request, wait = 0) => {
   return new Promise((resolve, reject) => {
     const params = createRequestParams(request);
@@ -120,13 +127,15 @@ const sendRequest = (request, wait = 0) => {
       analytics.data.ga.get(params)
         .then(res => {
           const { data: { rows: browsers, totalsForAllResults: { 'ga:sessions': total }}} = res;
-          const filteredBrowsers = (browsers) ? filterBrowsers(browsers, 0.025, total) : [];
-          const flattenedRequest = flattenRequest(request);
-          resolve({ ...flattenedRequest, browsers: filteredBrowsers });
+          resolve(handleAnalyticsResponse(request, browsers, total));
         })
         .catch(err => {
-          const newWait = (wait === 0) ? 1 : wait * 2;
-          resolve(sendRequest(request, newWait));
+          if (wait > 16) {
+            resolve(handleAnalyticsResponse(request));
+          } else {
+            const newWait = (wait === 0) ? 1 : wait * 2;
+            resolve(sendRequest(request, newWait));
+          }
         });
     }, wait * 1000);
   });
@@ -138,10 +147,12 @@ const sendRequests = requests => {
 };
 
 const get = async () => {
+  console.log('getting entire database.');
   return await siteFacade.find();
 };
 
 const clear = async () => {
+  console.log('clearing database.');
   return await siteFacade.clear();
 };
 

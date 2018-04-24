@@ -46,3 +46,4 @@ jspm_packages
 archive
 .DS_Store
 .env
+generate-browerslist-string.json

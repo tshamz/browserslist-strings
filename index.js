@@ -6,7 +6,6 @@ const morgan = require('morgan');
 
 const config = require('./config');
 const routes = require('./routes');
-const analytics = require('./analytics');
 
 const app = express();
 
@@ -21,7 +20,6 @@ app.use('/', routes);
 
 app.listen(config.server.port, () => {
   console.log(`Magic happens on port ${config.server.port}`);
-  analytics.setAuth();
 });
 
 module.exports = app;
