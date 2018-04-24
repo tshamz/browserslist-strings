@@ -141,6 +141,10 @@ const get = async () => {
   return await siteFacade.find();
 };
 
+const clear = async () => {
+  return await siteFacade.clear();
+};
+
 const update = async () => {
   await setAuth();
   const requests = await getRequestData();
@@ -149,8 +153,6 @@ const update = async () => {
   return await siteFacade.insertMany(entries);
 };
 
-const clear = async () => {
-  return await siteFacade.clear();
-};
+update();
 
 module.exports = { get, update, clear, setAuth };
