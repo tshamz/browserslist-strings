@@ -13,8 +13,13 @@ const setAuth = async (email, key, project) => {
   // auth.subject = 'analytics2@bvaccel.com';
   // google.options({ auth, project, quotaUser });
 
-
+  const email = process.env.GOOGLE_CLIENT_EMAIL;
+  const privateKey = process.env.GOOGLE_PRIVATE_KEY;
+  // const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
   const project = process.env.GOOGLE_PROJECT_ID;
+
+  console.log(email);
+  console.log(privateKey);
   console.log(project);
 
   // const auth = new google.auth.JWT(email, null, key, scopes);
@@ -152,6 +157,4 @@ const clear = async () => {
   return await siteFacade.clear();
 };
 
-setAuth();
-
-// module.exports = { get, update, clear, setAuth };
+module.exports = { get, update, clear, setAuth };
