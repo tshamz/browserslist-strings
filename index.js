@@ -12,7 +12,7 @@ const routes = require('./routes');
 
 const app = express();
 
-// mongoose.connect(config.mongo.url);
+mongoose.connect(config.mongo.url);
 
 app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -23,6 +23,7 @@ app.use('/', routes);
 
 app.listen(config.server.port, () => {
   console.log(`Magic happens on port ${config.server.port}`);
+  console.log(config.mongo.url);
   // const email = process.env.GOOGLE_CLIENT_EMAIL;
   // const privateKey = process.env.GOOGLE_PRIVATE_KEY;
   // const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
