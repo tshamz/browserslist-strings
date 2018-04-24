@@ -5,11 +5,6 @@ const siteFacade = require('./model/site/facade');
 const analytics = google.analytics('v3');
 
 const setAuth = async () => {
-  // const auth = await google.auth.getClient({ scopes });
-  // const project = await google.auth.getDefaultProjectId();
-  // auth.subject = 'analytics2@bvaccel.com';
-  // google.options({ auth, project, quotaUser });
-
   const email = process.env.GOOGLE_CLIENT_EMAIL;
   const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
   const scopes = ['https://www.googleapis.com/auth/analytics.readonly'];
@@ -84,7 +79,7 @@ const createRequestParams = request => {
     'start-date': '30daysAgo',
     'end-date': 'yesterday',
     'metrics': 'ga:sessions',
-    'dimensions': 'ga:browser,ga:browserVersion',
+    'dimensions': 'ga:browser,ga:browserVersion,ga:deviceCategory',
     'sort': '-ga:sessions',
     'max-results': '50'
   };
@@ -92,10 +87,10 @@ const createRequestParams = request => {
 
 const filterBrowsers = (browsers, threshold, total) => {
   return browsers.reduce((filteredBrowsers, browserData) => {
-    const [ browser, version, count ] = browserData;
+    const [ browser, browserVersion, device, count ] = browserData;
     const marketShare = parseInt(count) / parseInt(total);
     if (marketShare > threshold) {
-      return [ ...filteredBrowsers, { browser, version, marketShare }];
+      return [ ...filteredBrowsers, { browser, browserVersion, device, marketShare }];
     } else {
       return [ ...filteredBrowsers ];
     }
@@ -146,25 +141,21 @@ const sendRequests = requests => {
   return Promise.all(promises);
 };
 
-const get = async () => {
-  console.log('getting entire database.');
-  return await siteFacade.find();
-};
-
-const clear = async () => {
-  console.log('clearing database.');
-  return await siteFacade.clear();
-};
-
 const update = async () => {
   console.log('updating database.');
   await setAuth();
+  console.log('getting account data.');
   const requests = await getRequestData();
+  console.log('sending api requests.');
   const entries = await sendRequests(requests);
-  await clear();
-  return await siteFacade.insertMany(entries);
+  console.log('clearing database.');
+  await siteFacade.clear();
+  console.log('writing to database.');
+  const updatedEntries = await siteFacade.insertMany(entries);
+  console.log('database update complete.');
+  return updatedEntries;
 };
 
 update();
 
-module.exports = { get, update, clear, setAuth };
+module.exports = { update };

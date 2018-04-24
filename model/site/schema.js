@@ -3,7 +3,8 @@ const Schema = mongoose.Schema;
 
 const browser = {
   browser: String,
-  version: String,
+  browserVersion: String,
+  device: String,
   marketShare: Number
 };
 
