@@ -146,6 +146,7 @@ const clear = async () => {
 };
 
 const update = async () => {
+  console.log('updating database.');
   await setAuth();
   const requests = await getRequestData();
   const entries = await sendRequests(requests);
