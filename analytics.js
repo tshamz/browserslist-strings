@@ -14,9 +14,9 @@ const setAuth = async () => {
   // google.options({ auth, project, quotaUser });
 
   const email = process.env.GOOGLE_CLIENT_EMAIL;
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY;
+  // const privateKey = process.env.GOOGLE_PRIVATE_KEY;
+  const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
   const project = process.env.GOOGLE_PROJECT_ID;
-  // const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
 
   const auth = new google.auth.JWT(email, null, privateKey, scopes);
   auth.subject = 'analytics2@bvaccel.com';
