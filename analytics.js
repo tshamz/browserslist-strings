@@ -7,7 +7,7 @@ const analytics = google.analytics('v3');
 const scopes = ['https://www.googleapis.com/auth/analytics.readonly'];
 const quotaUser = 'browserslist-string';
 
-const setAuth = async (email, key, project) => {
+const setAuth = async () => {
   // const auth = await google.auth.getClient({ scopes });
   // const project = await google.auth.getDefaultProjectId();
   // auth.subject = 'analytics2@bvaccel.com';
